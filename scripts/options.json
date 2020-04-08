@@ -1,0 +1,29 @@
+{
+  "maxRedirects": 0,
+  "vus": 1,
+  "discardResponseBodies": true
+  "stages": [
+    {
+      "duration": "30s",
+      "target": 7
+    },
+    {
+      "duration": "240s",
+      "target": 15
+    }
+  ],
+  "thresholds": {
+    "http_req_duration": [
+      {
+        "threshold": "p(95) < 10000",
+        "abortOnFail": true
+      }
+    ],
+    "checks": [
+      {
+        "threshold": "rate >= 1",
+        "abortOnFail": true
+      }
+    ]
+  }
+}
