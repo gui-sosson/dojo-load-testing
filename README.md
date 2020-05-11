@@ -27,7 +27,7 @@
 - create an HAR from Chrome (precise instructions [here](https://k6.io/docs/using-k6/session-recording-har-support#1--record-a-har-file)), put it into `./scripts`
 - convert the HAR into a scenario, you will need to give it a name and to provide a white list of domain names:
     `docker-compose run --rm k6 convert -O /scripts/my-scenario.js --only my-dns-domain-name --enable-status-code-checks --options /scripts/options.json /scripts/my.domain.har`
-- run the test: `dc run --rm k6 run /scripts/my-scenario.js`
+- run the test: `docker-compose run --rm k6 run /scripts/my-scenario.js`
 - connect to [http://localhost:3000](http://localhost:3000) you should see Grafana UI
 - import the dashboard:
   - copy content of `./visualisation/grafana-dashboard-config-to-import.json` (`cat ./visualisation/grafana-dashboard-config-to-import.json | pbcopy`)

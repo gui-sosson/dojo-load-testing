@@ -1,7 +1,7 @@
 {
   "maxRedirects": 0,
   "vus": 1,
-  "discardResponseBodies": true
+  "discardResponseBodies": true,
   "stages": [
     {
       "duration": "30s",
