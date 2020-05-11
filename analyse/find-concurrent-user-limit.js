@@ -1,7 +1,7 @@
 const axios = require('axios')
 
-async function getPercentileByUrlsSeries(k6InfluxDbUrl, percentile, totalGroupSeconds, beginEpochNanoSeconds, endEpochNanoSeconds) {
-  const getPercentileByUrlsInfluxQuery = `SELECT percentile("value",${percentile}) FROM http_req_duration WHERE time >= ${beginEpochNanoSeconds} AND time <= ${endEpochNanoSeconds} GROUP BY "name",time(${totalGroupSeconds}s)`
+async function getPercentileByUrlsSeries(k6InfluxDbUrl, percentile, totalGroupSeconds, beginEpochMilliSeconds, endEpochMilliSeconds) {
+  const getPercentileByUrlsInfluxQuery = `SELECT percentile("value",${percentile}) FROM http_req_duration WHERE time >= ${beginEpochMilliSeconds}000000 AND time <= ${endEpochMilliSeconds}000000 GROUP BY "name",time(${totalGroupSeconds}s)`
   const response = await axios.get(k6InfluxDbUrl, {params: {q: getPercentileByUrlsInfluxQuery}})
 
   return response.data.results[0].series
@@ -49,8 +49,8 @@ async function main() {
     k6InfluxDbUrl,
     percentile,
     totalGroupSeconds,
-    params.beginEpochNanoSeconds,
-    params.endEpochNanoSeconds
+    params.beginEpochMilliSeconds,
+    params.endEpochMilliSeconds
   );
   if (!series) {
     console.log('No series found during this period')

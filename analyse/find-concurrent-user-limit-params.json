@@ -1,8 +1,8 @@
 {
   "projectName": "k6",
-  "beginEpochNanoSeconds": 1586250100000000000,
-  "endEpochNanoSeconds": 1586250680000000000,
+  "beginEpochMilliSeconds": 1586250100000,
+  "endEpochMilliSeconds": 1586250680000,
   "timeThresholdMappedByUrls": {
   },
-  "defaultTimeThreshold": 3000
+  "defaultTimeThreshold": 1000
 }
