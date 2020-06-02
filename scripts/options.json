@@ -5,17 +5,17 @@
   "stages": [
     {
       "duration": "30s",
-      "target": 7
+      "target": 70
     },
     {
       "duration": "240s",
-      "target": 15
+      "target": 150
     }
   ],
   "thresholds": {
     "http_req_duration": [
       {
-        "threshold": "p(95) < 10000",
+        "threshold": "p(95) < 5000",
         "abortOnFail": true
       }
     ],
