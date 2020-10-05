@@ -46,6 +46,8 @@ test" to understand what is going on.
 - A json file that let you configure the previous script (`./analyse`)
 - A json file with default options for a scenario (`./scripts`)
 - This README with some commands to run
+- This README with some explanations of the tools, the steps and how to customize them
+- An example of script with comments to help you create a custom script (`./scripts`)
 
 ## Details
 
@@ -342,6 +344,28 @@ such a `check` to all request generated.
 >and a new login would break the registered session for all vus since
 >the session is hard coded in the HAR and in the generated scenario.
 
+>You may want to use different queries to avoid always hitting the
+>same cached response. You can either add a random parameter or
+>choosing a random element from an array of options created in the
+>init phase. To see how similar (but not exactly identical) queries
+>perform you should tag the requests with "name" equal to the common
+>part of your url or any understandable name, instead of the default
+>full url https://k6.io/docs/using-k6/http-requests#http-request-tags
+>to do so use `Params.tags` of
+>https://k6.io/docs/javascript-api/k6-http/params-k6-http. You may
+>also use the "Execution context variables"
+>https://k6.io/docs/using-k6/execution-context-variables (index of
+>virtual user and index of iteration for this virtual user) to control
+>what is sent in the request.
+
+>If you need complex scripting you may want to access the response
+>body. The options are:
+>- to remove "discardResponseBodies" option (Warning it can make test
+>  less efficient)
+>- to use "{responseType: text}" in the params of the specific
+>  requests for which you need the body
+>  (cf. [doc](https://k6.io/docs/javascript-api/k6-http/params))
+
 #### Running a scenario
 
 A K6 scenario have two main parts (there are four but not used here
@@ -410,38 +434,31 @@ to wait all night for results.
 >- 204 response status, you should change the checks with a query
 >  replace to allow 200 and 204
 
+>You can debug errors by making your scenario smaller (dichotomy) and
+>by using the `--http-debug` option you get the request and response
+>payload. You can also use `-i 1 -u 1` which specifies to perform one
+>iteration of one virtual user.
+
+>Make sure the computer you use is not limited by the bandwidth of
+>your internet connection. Usually an optical fiber is requisite. You
+>can also be limited if you use a VPN.
+
 >Do not use to much sleep time during execution because for
 >performance reasons (mainly memory usage) it is better to create the
 >same charge with less virtual users if possible
 
->When you use many vus (500 for instance) check your own laptop
->performance (CPU usage and memory) because your test won't be very
->relevant under some circumptances. If you swap for instance, or if
->you always are at your maximum internet connection or maximum CPU
->load. Those cases would tell more about your laptop limitations than
->the ones of your system.
-
->You may want to use different queries to avoid always hitting the
->same cached response. You can either add a random parameter or
->choosing a random element from an array of options created in the
->init phase. To see how similar (but not exactly identical) queries
->perform you should tag the requests with "name" equal to the common
->part of your url instead of the default full url
->https://k6.io/docs/using-k6/http-requests#http-request-tags to do so use
->Params.tags of
->https://k6.io/docs/javascript-api/k6-http/params-k6-http.
+>When you use many vus (more than 500 for instance) check your own
+>laptop performance (CPU usage and memory) because your test won't be
+>relevant if your computer hit its limits. If there is not enough RAM
+>and swap is used or if CPU load is maximal for instance. Those cases
+>would tell more about your laptop limitations than the ones of your
+>system.
 
 >For more complex cases there are two options either script the
 >scenario or change some behaviors of your app (like longer auth
 >credentials or statics ones maybe, remove caching if you want to
 >tests more your code, remove a security that prevent a database
 >entity from being used in several iterations)
-
->If you need complex scripting you may want to remove
->"discardResponseBodies" option that is here to make test more
->efficient you can also use "{responseType: text}" in the params of
->the specific requests you need the body
->([doc](https://k6.io/docs/javascript-api/k6-http/params))
 
 #### Visualize the test when it runs
 
@@ -478,8 +495,8 @@ POC). This script performs queries to influxdb to determine at what
 time the queries are too slow and outputs the number of vus at this
 time.
 
-> For this to work you need to provide parameters in a json file
-> (`analyse/find-concurrent-user-limit-params.json`)
+For this to work you need to provide parameters in a json file
+(`analyse/find-concurrent-user-limit-params.json`)
 
 - `projectName` needs to be the influxDB name
 - `beginEpochMilliSeconds` and its couterpart can easyly be fetched from
