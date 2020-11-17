@@ -19,7 +19,12 @@ test" to understand what is going on.
 ## Perform a test
 
 - start docker containers `docker-compose up -d` (make sure ports of docker-compose are available: 3000)
-- create an HAR from Chrome (precise instructions [here](https://k6.io/docs/using-k6/session-recording-har-support#1--record-a-har-file)), put it into `./scripts`
+- create an HAR from Chrome (precise instructions [here](https://k6.io/docs/using-k6/session-recording-har-support#record-a-har-file)), put it into `./scripts`
+  - navigate as a regular user on a path relevant for your
+    business. Please avoid scenario that contains non GET http calls
+    at first (authentication for instance). If you do, please refer to
+    the [Create a scenario](#create-a-scenario) section to avoid
+    common problems.
 - convert the HAR into a scenario, you will need to give it a name and to provide a white list of domain names:
     `docker-compose run --rm k6 convert -O /scripts/my-scenario.js --only my-dns-domain-name --enable-status-code-checks --options /scripts/options.json --min-sleep 1 --max-sleep 5 /scripts/my.domain.har`
 - run the test: `docker-compose run --rm k6 run /scripts/my-scenario.js`
@@ -40,14 +45,18 @@ test" to understand what is going on.
 
 ## What does the boilerplate add?
 
+- This README with some commands to run
+- This README with some explanations of the tools, the steps and how to customize them
+- An **example of script** with comments to help you create a custom script (`./scripts`)
+
+This exemple script is a good entry point to understand what the
+generated scenario does without reading the whole README.
+
 - A json to configure your dashboard in grafana (`./visualisation`)
 - A docker-compose file that binds the tools together
 - A simple node js scripts that computes the maximum number of concurrent users before tested applications becomes slow (`./analyse`)
 - A json file that let you configure the previous script (`./analyse`)
 - A json file with default options for a scenario (`./scripts`)
-- This README with some commands to run
-- This README with some explanations of the tools, the steps and how to customize them
-- An example of script with comments to help you create a custom script (`./scripts`)
 
 ## Details
 
@@ -70,7 +79,7 @@ they do and finally we we'll see details of what you do when you
 perform a test.
 
 To troubleshoot the "Perform a test" part go directly to "Key points
-of the documentation". If you want some background first read
+of the documentation". If you want some background first, you can read
 linearly.
 
 Practical advice will be put as quotes to make them easier to find.
@@ -290,6 +299,14 @@ original documentations**
 This parts will only focus on explaining important parts of what's
 going on in the commands listed to perform a test.
 
+#### The exemple script
+
+You may want to explore the
+[exemple script](./scripts/example-custom-scenarion.js) to understand
+where some of these explanations may be used. The example script is a
+quicker way to understand basic problems and how to modify (or create)
+your scenario.
+
 #### Setup
 
 First you `docker-compose up` the containers. There is a container for
@@ -358,13 +375,17 @@ such a `check` to all request generated.
 >virtual user and index of iteration for this virtual user) to control
 >what is sent in the request.
 
->If you need complex scripting you may want to access the response
+>If you need scripting you may want to access the response
 >body. The options are:
 >- to remove "discardResponseBodies" option (Warning it can make test
 >  less efficient)
 >- to use "{responseType: text}" in the params of the specific
 >  requests for which you need the body
 >  (cf. [doc](https://k6.io/docs/javascript-api/k6-http/params))
+>
+>Typical use case is to perform call with the id of a previously
+>created entity. For each iteration you may want to modify the created
+>instance instead of the instance created during recording.
 
 #### Running a scenario
 
@@ -433,6 +454,7 @@ to wait all night for results.
 >  scripting in the beginning
 >- 204 response status, you should change the checks with a query
 >  replace to allow 200 and 204
+>- hitting a rate limit designed to protect your application
 
 >You can debug errors by making your scenario smaller (dichotomy) and
 >by using the `--http-debug` option you get the request and response
@@ -442,6 +464,13 @@ to wait all night for results.
 >Make sure the computer you use is not limited by the bandwidth of
 >your internet connection. Usually an optical fiber is requisite. You
 >can also be limited if you use a VPN.
+>To get around these problems you need to run your test from
+>another computer who does not have the same limitations. For instance
+>from a computer that has a direct access instead of using the VPN.
+
+>You can be limited by a DDoS protection of your infrastructure. The
+>easiest way to get around this, is to deactivate this protection for
+>the IP your test is running from.
 
 >Do not use to much sleep time during execution because for
 >performance reasons (mainly memory usage) it is better to create the
