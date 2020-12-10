@@ -1,14 +1,18 @@
 # load test boilerplate
 
-This README begins with simple instructions to follow if you already
-know what you are doing but details are provided below "Perform a
-test" to understand what is going on.
+## This README is long, you should use the table of content in Details section to find the relevant part to read for your problem.
 
-## Prerequisite
+## Technical prerequisites
 
 - [Node.js](https://nodejs.org/en/) installed (use can use [nvm](https://github.com/nvm-sh/nvm) to do so)
 - [Docker](https://docs.docker.com/get-docker/) installed
 - [Docker Compose](https://docs.docker.com/compose/install/) installed
+
+## Prerequisites
+
+- **Know the charge the platform should handle to achieve business success**
+- Have an iso prod infrastructure
+- Have enough features to test a business relevant scenario
 
 ## Tools
 
@@ -18,30 +22,26 @@ test" to understand what is going on.
 
 ## Perform a test
 
+For Theodo people you can watch a
+[demo video](https://www.notion.so/m33/Demo-for-K6-a89cdec0aa184b96a713ee505137efb4).
+
+- make sure you **understand** ["Key points of the documentation"](#key-points-of-the-documentation)
 - start docker containers `docker-compose up -d` (make sure ports of docker-compose are available: 3000)
-- create an HAR from Chrome (precise instructions [here](https://k6.io/docs/using-k6/session-recording-har-support#record-a-har-file)), put it into `./scripts`
+- to create an HAR:
+  - open Chrome with inspector opened
   - navigate as a regular user on a path relevant for your
     business. Please avoid scenario that contains non GET http calls
     at first (authentication for instance). If you do, please refer to
     the [Create a scenario](#create-a-scenario) section to avoid
     common problems.
-- convert the HAR into a scenario, you will need to give it a name and to provide a white list of domain names:
+  - right click on any item of network and on "save all as HAR", put it into `./scripts`
+- convert the HAR into a scenario, you will **need** to give it a name and to provide a **white list of domain names**:
     `docker-compose run --rm k6 convert -O /scripts/my-scenario.js --only my-dns-domain-name --enable-status-code-checks --options /scripts/options.json --min-sleep 1 --max-sleep 5 /scripts/my.domain.har`
 - run the test: `docker-compose run --rm k6 run /scripts/my-scenario.js`
-- connect to [http://localhost:3000](http://localhost:3000) you should see Grafana UI
+- connect to [http://localhost:3000](http://localhost:3000), you should see Grafana UI
 - import the dashboard:
   - copy content of `./visualisation/grafana-dashboard-config-to-import.json` (`cat ./visualisation/grafana-dashboard-config-to-import.json | pbcopy`)
   - click "+" > click "import" > paste json content > click "Load" > click "Import"
-- find the maximum of concurent users:
-  - in `./analyse` run `npm install`
-  - in Grafana:
-    - zoom to have your whole test visible
-    - copy to `from` and `to` query param
-  - in `./analyse/find-concurrent-user-limit-params.json`:
-    - paste values to the `beginEpochMilliSeconds` and `endEpochMilliSeconds` fields
-    - update the defaultTimeThreshold in milliseconds
-    - (optionnal) update `timeThresholdMappedByUrls` with urls as keys and milliseconds as value
-  - run `node find-concurrent-user-limit.js`
 
 ## What does the boilerplate add?
 
@@ -64,23 +64,13 @@ The goals of this part are to make you as autonomous as possible to
 make your first basic tests and to feel confident to be able to make
 it more complex once you have experimented all this.
 
-To be autonomous you need to understand:
-- what is a test?
-- what are the elements of the test?
-- what to look for during a test?
-- what are the roles of the tools we use?
-- how they interact?
-- what to test?
-- how to write the scenario that suits your needs?
-- what to tell your PO to make him confident (if he should be)?
-
 First we'll see what we talk about, then what tools we use and what
 they do and finally we we'll see details of what you do when you
 perform a test.
 
-To troubleshoot the "Perform a test" part go directly to "Key points
+**To troubleshoot the "Perform a test" part go directly to "Key points
 of the documentation". If you want some background first, you can read
-linearly.
+linearly.**
 
 Practical advice will be put as quotes to make them easier to find.
 
@@ -99,6 +89,16 @@ Practical advice will be put as quotes to make them easier to find.
   - [Running a scenario](#running-a-scenario)
   - [Visualize the test when it runs](#visualize-the-test-when-it-runs)
   - [Analyse the results](#analyse-the-results)
+
+To be autonomous you need to understand:
+- what is a test?
+- what are the elements of the test?
+- what to look for during a test?
+- what are the roles of the tools we use?
+- how they interact?
+- what to test?
+- how to write the scenario that suits your needs?
+- what to tell your PO to make him confident (if he should be)?
 
 ### Process
 
@@ -293,8 +293,9 @@ https://grafana.com/docs/grafana/latest/getting-started/getting-started/
 
 ### Key points of the documentation
 
-**This part may become outdated, in case of doubt please refer to the
-original documentations**
+**What is explain will broadly remain true, however the technical
+parts may become outdated, in case of doubt please refer to the
+original documentations for the syntax**
 
 This parts will only focus on explaining important parts of what's
 going on in the commands listed to perform a test.
@@ -302,10 +303,20 @@ going on in the commands listed to perform a test.
 #### The exemple script
 
 You may want to explore the
-[exemple script](./scripts/example-custom-scenarion.js) to understand
-where some of these explanations may be used. The example script is a
-quicker way to understand basic problems and how to modify (or create)
-your scenario.
+[exemple script](./scripts/example-custom-scenario.js) to understand
+where some of the explanations of the
+["Create a scenario"](#create-a-scenario) and
+["Running a scenario"](#running-a-scenario) may be used. The example
+script is a quicker way to understand basic problems and how to modify
+(or create) your scenario.
+
+#### Content
+
+- [Setup](#setup)
+- [Create a scenario](#create-a-scenario)
+- [Running a scenario](#running-a-scenario)
+- [Visualize the test when it runs](#visualize-the-test-when-it-runs)
+- [Analyse the results](#analyse-the-results)
 
 #### Setup
 
@@ -325,25 +336,25 @@ with Grafana.
 
 #### Create a scenario
 
-Now you are ready to perform a test. You need a business scenario
-in mind and you need to create a script in js that represents this
+Now you are ready to perform a test. You need a business scenario in
+mind and you need to create a script in js that represents this
 scenario. Fortunately K6 provides a way to convert a HAR (Http Archive
 Format) which is a json file that your browser can produce to a
-scenario. To do this please refer to the documetation of k6 (link
-available in the steps to perform a test).
+scenario. To do this please refer to the
+["perform a test"](#perform-a-test) part.
 
 What is interesting here are some of the options.
 
-When you test you might not want to perform certain requests, and you
-must not test non HTTP requests (like websocket). *Typically you do
-not necessarily want to tests requests to external CDN that loads
-fonts or scripts.* The `only` options takes a comma separated list of
-dns names and removes the queries to other dns.
+When you test you might not want to perform certain
+requests. *Typically you do not necessarily want to tests requests to
+external CDN that loads fonts or scripts.* The `only` options takes a
+comma separated list of dns names and removes the queries to other
+dns.
 
-You will usually use common test options (and not convert options)
-accross your scenarios. The `options` option allow you to specify a
-json that is then put as js code in the generated scenario (more on
-that later).
+You will usually use common test options (different from convert
+options) accross your scenarios. The `options` option allow you to
+specify a json that is then put as js code in the generated scenario
+(more on that later).
 
 Finally a very basic scripting you may want to perform is check the
 HTTP status of your requests because they should not change. *Typically
@@ -515,15 +526,70 @@ You can find 7 blocks:
 
 #### Analyse the results
 
-Ok you have a curve and an approximate idea of where things changes
-but it is quite subtle generally.
+Ok you have a curve and an approximate idea of where things change
+but it is quite subtle generally. If you are not sure of the number of
+virtual users you can use the small scripts
+(`analyse/find-concurrent-user-limit.js`) explained below.
+
+First we'll see two ways to find a metric meaningful for your
+business. The last part explains how to use the script.
+
+___
+**Create a test to have a factual number**
+
+Once you have an approximate count of vus (`X`) that the platform can
+handle (plot 1). The best way to check is to perform a new test with
+this number as a final target flat for several minutes (plot 2). For
+example run the test from 0 to X in 30 seconds and from X to X (flat)
+for 4.5 minutes. Then you can see in the k6 report (in your terminal,
+not grafana) how many iterations have been performed in 5 minutes
+(`N`).
+
+Plot 1
+
+<img src="./img/test-to-have-the-number-of-virtual-users-when-the-platform-fails.png" alt="test to have the number of virtual users when the platform fails" width="400">
+
+Plot 2
+
+<img src="./img/test-to-have-iteration-count-that-the-platform-can-handle.png" alt="test to have iteration count that the platform can handle" width="400">
+
+Regardless of how fast was your iteration, you can tell your client
+the platform supports N users doing the scenario every five minutes
+or you can convert it to an amount of time meaningfull for your
+client. For instance : "If half our regular users come the same day
+during a time frame of two hours we should be fine".
+
+Key information:
+- Business meaning of an iteration
+- Number of iterations (`N`)
+- Duration of test: 5 minutes
+
+**You can perform `N` times the business task in 5 minutes.**
+
+___
+**Use your normal test to have an approximation**
+
+If you do not need to be as precise, you can juste measure how fast is
+the iteration when the website run normally and use this with `V`
+(number of vus before it gets messy) to compute an approximation of
+what is described above.
+
+Key information:
+- Business meaning of an iteration
+- Duration of an iteration in normal conditions (`D` in seconds)
+- Number of virtual user before the platform does not respond well
+  enough (`V`)
+
+**You can perform `X` times the business task in 5 minutes where `X = 300/D * V`.**
+
+___
+**The script to determine the number of virtual users your platform can handle**
 
 This repo contains a small scripts
 (`analyse/find-concurrent-user-limit.js`) written in js (as a
 POC). This script performs queries to influxdb to determine at what
 time the queries are too slow and outputs the number of vus at this
-time.
-
+time.  
 For this to work you need to provide parameters in a json file
 (`analyse/find-concurrent-user-limit-params.json`)
 
