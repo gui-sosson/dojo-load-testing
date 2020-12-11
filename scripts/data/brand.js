@@ -1,0 +1,6 @@
+export const BRANDS = [
+    "3Ax1iNQr-little-paris",
+    "6IQhmVf0-so-nice",
+    "hwjHKG9u-mike-brand",
+    "xguNUWkl-trone",
+]

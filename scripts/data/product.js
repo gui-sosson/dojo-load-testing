@@ -1,0 +1,6 @@
+export const PRODUCTS = [
+    "nILwo94r-beautiful-shoes",
+    "3km1KqOF-marvelous-shoes",
+    "O1RsdDBk-incredible-coat",
+    "T2HUujJv-not-so-good-socks",
+]

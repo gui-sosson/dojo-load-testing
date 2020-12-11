@@ -1,6 +1,9 @@
 import { group, check, sleep } from 'k6';
 import http from 'k6/http';
 
+// This example demonstrate various options and the syntax to write a
+// custom scenario.
+
 // To debug run this script with -u 1 -i 1 --http-debug. These options
 // means to run the script with one virtual User, with one Iteration
 // and to display the requests/responses information

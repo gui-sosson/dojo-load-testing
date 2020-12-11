@@ -16,13 +16,13 @@
     "http_req_duration": [
       {
         "threshold": "p(95) < 5000",
-        "abortOnFail": true
+        "abortOnFail": false
       }
     ],
     "checks": [
       {
         "threshold": "rate >= 1",
-        "abortOnFail": true
+        "abortOnFail": false
       }
     ]
   }
