@@ -1,9 +1,13 @@
 import { group, check, sleep } from 'k6';
 import http from 'k6/http';
-import { BRANDS } from './data/brand.js';
-import { PRODUCTS } from './data/product.js';
 
 // This example suppose you already know how to write a custom scenario.
+
+// Used to have memory shared across virtual users to avoid a crash.
+import { SharedArray } from "k6/data";
+
+const BRANDS = new SharedArray("brands", function() { return JSON.parse(open('./data/brands.json')).brands; });
+const PRODUCTS = new SharedArray("products", function() { return JSON.parse(open('./data/products.json')).products; });
 
 // This example demonstrate how to handle a case where you want to
 // test several scenarios with various probabilities. This is

@@ -300,7 +300,7 @@ original documentations for the syntax**
 This parts will only focus on explaining important parts of what's
 going on in the commands listed to perform a test.
 
-#### The exemple script
+#### The exemple scripts
 
 You may want to explore the
 [exemple script](./scripts/example-custom-scenario.js) to understand
@@ -309,6 +309,9 @@ where some of the explanations of the
 ["Running a scenario"](#running-a-scenario) may be used. The example
 script is a quicker way to understand basic problems and how to modify
 (or create) your scenario.
+
+Other exemple are provided. This list may not be explicit, please look
+directly in [scripts](./scripts) to see if you may use some exemple.
 
 #### Content
 
@@ -375,16 +378,20 @@ such a `check` to all request generated.
 >You may want to use different queries to avoid always hitting the
 >same cached response. You can either add a random parameter or
 >choosing a random element from an array of options created in the
->init phase. To see how similar (but not exactly identical) queries
->perform you should tag the requests with "name" equal to the common
->part of your url or any understandable name, instead of the default
->full url https://k6.io/docs/using-k6/http-requests#http-request-tags
->to do so use `Params.tags` of
->https://k6.io/docs/javascript-api/k6-http/params-k6-http. You may
->also use the "Execution context variables"
->https://k6.io/docs/using-k6/execution-context-variables (index of
->virtual user and index of iteration for this virtual user) to control
->what is sent in the request.
+>init phase, this is called parametrisation
+>(cf. [documentation](https://k6.io/docs/examples/data-parameterization)).
+>You can find an exemple
+>[here](./scripts/example-with-weighted-scenarios-and-parametrisation.js).
+>To see how similar (but not exactly identical) queries perform you
+>should
+>[tag](https://k6.io/docs/using-k6/http-requests#http-request-tags)
+>the requests with "name" equal to the common part of your url or any
+>understandable name, instead of the default full url to do so use
+>[`Params.tags`](https://k6.io/docs/javascript-api/k6-http/params-k6-http).
+>You may also use the
+>[Execution context variables](https://k6.io/docs/using-k6/execution-context-variables)
+>(index of virtual user and index of iteration for this virtual user)
+>to control what is sent in the request.
 
 >If you need scripting you may want to access the response
 >body. The options are:
@@ -400,17 +407,18 @@ such a `check` to all request generated.
 
 #### Running a scenario
 
-A K6 scenario have two main parts (there are four but not used here
-https://k6.io/docs/using-k6/test-life-cycle). The init part is
-everything that is not in a special function, it is executed once and
-it is here that you should perform heavy operation that should be
-available accross vus. For instance you can import modules only from
-here. The other part is the code executed by vus and lies in default
-anonymous function.
+A K6 scenario have two main parts (in
+[the documentaion](https://k6.io/docs/using-k6/test-life-cycle) there
+are four but not used here). The init part is everything that is not
+in a special function, it is executed once and it is here that you
+should perform heavy operation that should be available accross
+vus. For instance you can import modules only from here. The other
+part is the code executed by vus and lies in default anonymous
+function.
 
 In the init part we load some k6 functions (to use them during
-execution) and add some options. These options are numerous
-https://k6.io/docs/using-k6/options but here we use:
+execution) and add some options. There are a lot of
+[options](https://k6.io/docs/using-k6/options) but here we use:
 - **stages** to "explore" different loads and find limits of our
   system,
 - **thresholds** to stop the test if we believe it won't be relevant (for
