@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "har-to-k6": "^0.9.0",
+    "node-jq": "^1.12.0"
+  }
+}

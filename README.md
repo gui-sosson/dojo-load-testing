@@ -34,9 +34,9 @@ For Theodo people you can watch a
     at first (authentication for instance). If you do, please refer to
     the [Create a scenario](#create-a-scenario) section to avoid
     common problems.
-  - right click on any item of network and on "save all as HAR", put it into `./scripts`
-- convert the HAR into a scenario, you will **need** to give it a name and to provide a **white list of domain names**:
-    `docker-compose run --rm k6 convert -O /scripts/my-scenario.js --only my-dns-domain-name --enable-status-code-checks --options /scripts/options.json --min-sleep 1 --max-sleep 5 /scripts/my.domain.har`
+  - after filtering the domains you want to test, right click on any item of network and on "save all as HAR", put it into `./scripts`
+- convert the HAR into a scenario, you will **need** to give it a name (do not forget to `npm install`):
+    `./node_modules/.bin/har-to-k6 -o scripts/my-scenario.js --add-sleep <(./node_modules/node-jq/bin/jq -s '.[0].log.options = .[1] | .[0]' scripts/my-scenario.har scripts/options.json)`
 - run the test: `docker-compose run --rm k6 run /scripts/my-scenario.js`
 - connect to [http://localhost:3000](http://localhost:3000), you should see Grafana UI
 - import the dashboard:
@@ -191,7 +191,7 @@ The three main metrics are:
   max simultaneous users will be half what it was because the load on
   the server will be twice higher. The extrapolation remains good
   because the duration is used to convert a number of simultaneous
-  users to a number of users who can perform a complete taks in a
+  users to a number of users who can perform a complete task in a
   certain amount of time.*
 - number of **iterations**: basically it the same as above except you
   do not need to make extrapolations. It is the number of times the
@@ -340,7 +340,7 @@ with Grafana.
 #### Create a scenario
 
 Now you are ready to perform a test. You need a business scenario in
-mind and you need to create a script in js that represents this
+mind and you need to create a script in `js` that represents this
 scenario. Fortunately K6 provides a way to convert a HAR (Http Archive
 Format) which is a json file that your browser can produce to a
 scenario. To do this please refer to the
@@ -350,21 +350,31 @@ What is interesting here are some of the options.
 
 When you test you might not want to perform certain
 requests. *Typically you do not necessarily want to tests requests to
-external CDN that loads fonts or scripts.* The `only` options takes a
-comma separated list of dns names and removes the queries to other
-dns.
+external CDN that loads fonts or scripts.* You must filter it in your
+brower before generating HAR file.
 
-You will usually use common test options (different from convert
-options) accross your scenarios. The `options` option allow you to
-specify a json that is then put as js code in the generated scenario
-(more on that later).
+You will usually use common scenario options. This is added to the HAR
+thanks to `jq` and can be edited in the generated `js` scenario.
 
 Finally a very basic scripting you may want to perform is check the
-HTTP status of your requests because they should not change. *Typically
-an auth token expired will produce a lot of 401 which would not
-respond in the same delay as the same request with valid credential
-making the test useless.* The option `enable-status-code-checks` adds
-such a `check` to all request generated.
+HTTP status of your requests because they should not
+change. *Typically an auth token expired will produce a lot of 401
+which would not respond in the same delay as the same request with
+valid credential making the test useless.*
+[The documentation](https://k6.io/docs/javascript-api/k6-http/setresponsecallback-callback/)
+says that by default 200-399 codes are considered valid. If for some
+reason you need to authorize another code please use the following
+code on the particular request.
+
+```js
+// begin of file before default function
+var shouldBe404Callback = http.expectedStatuses(404);
+
+export default () => {
+    // use the defined callback to validate that specific resquest
+    http.get("url", {responseCallback: shouldBe404Callback});
+}
+```
 
 >It is recommended to begin with testing all your urls when using only. Do
 >not exclude your assets subdomain if you have one for instance. If it
@@ -445,14 +455,6 @@ browser (wait for assets on HTTP1 connections, wait for js execution
 before some queries, wait image is visble before loading it...) thanks
 to sleep function. Requests at similar timestamp are batched for
 better performance.
-
-At the end there is a random sleep. You may wonder why the reason is
-quite simple, it allows iterations launched at the same moment to
-finish relatively at different moments. This is good to prevent
-requests synchronisations during tests which tend to create extremely
-high load on a very short time frame. It is not so useful though
-because in the options of this exemple the stages already handle this
-problem by launching vus one by one.
 
 The stages are used to create a ramp up in charge that let some time
 to the system to stabilise (load caches, allocate memory...) The ramp

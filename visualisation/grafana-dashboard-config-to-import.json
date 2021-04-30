@@ -17,7 +17,7 @@
   "gnetId": 4411,
   "graphTooltip": 2,
   "id": 1,
-  "iteration": 1576076573455,
+  "iteration": 1619799364901,
   "links": [],
   "panels": [
     {
@@ -41,6 +41,12 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "$datasource_name",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -67,9 +73,10 @@
       "links": [],
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
+      "pluginVersion": "7.5.1",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -164,6 +171,12 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "$datasource_name",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -191,9 +204,10 @@
       "links": [],
       "nullPointMode": "connected",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
+      "pluginVersion": "7.5.1",
       "pointradius": 1,
       "points": false,
       "renderer": "flot",
@@ -285,6 +299,10 @@
     {
       "columns": [],
       "datasource": "$datasource_name",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "fontSize": "100%",
       "gridPos": {
         "h": 14,
@@ -294,7 +312,6 @@
       },
       "id": 67,
       "links": [],
-      "options": {},
       "pageSize": null,
       "scroll": true,
       "showHeader": true,
@@ -305,12 +322,14 @@
       "styles": [
         {
           "alias": "Time",
+          "align": "auto",
           "dateFormat": "YYYY-MM-DD HH:mm:ss",
           "pattern": "Time",
           "type": "hidden"
         },
         {
           "alias": "P95",
+          "align": "auto",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -327,6 +346,7 @@
         },
         {
           "alias": "URL",
+          "align": "auto",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -385,7 +405,7 @@
       ],
       "title": "URLs and 95p latency",
       "transform": "table",
-      "type": "table"
+      "type": "table-old"
     },
     {
       "aliasColors": {},
@@ -393,6 +413,12 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "$datasource_name",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
       "fill": 0,
       "fillGradient": 0,
       "gridPos": {
@@ -419,9 +445,10 @@
       "links": [],
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
+      "pluginVersion": "7.5.1",
       "pointradius": 0.5,
       "points": false,
       "renderer": "flot",
@@ -458,7 +485,7 @@
               "type": "fill"
             }
           ],
-          "measurement": "checks",
+          "measurement": "http_req_failed",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "C",
@@ -473,7 +500,7 @@
               },
               {
                 "params": [],
-                "type": "sum"
+                "type": "count"
               }
             ]
           ],
@@ -527,6 +554,12 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "$datasource_name",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
       "fill": 0,
       "fillGradient": 0,
       "gridPos": {
@@ -553,9 +586,10 @@
       "links": [],
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
+      "pluginVersion": "7.5.1",
       "pointradius": 0.5,
       "points": false,
       "renderer": "flot",
@@ -595,7 +629,7 @@
           "measurement": "checks",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT count(\"value\") FROM \"checks\" WHERE value = 0 AND $timeFilter GROUP BY time($__interval), \"check\" fill(0)",
+          "query": "SELECT count(\"value\") FROM \"http_req_failed\" WHERE value = 1 AND $timeFilter GROUP BY time($__interval), \"check\" fill(0)",
           "rawQuery": true,
           "refId": "C",
           "resultFormat": "time_series",
@@ -695,6 +729,12 @@
       "dashes": false,
       "datasource": "$datasource_name",
       "description": "Grouped by 1 sec intervals",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -723,9 +763,10 @@
       "links": [],
       "nullPointMode": "connected",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
+      "pluginVersion": "7.5.1",
       "pointradius": 1,
       "points": true,
       "renderer": "flot",
@@ -982,6 +1023,10 @@
       },
       "dataFormat": "timeseries",
       "datasource": "$datasource_name",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 7,
         "w": 12,
@@ -998,7 +1043,6 @@
         "show": false
       },
       "links": [],
-      "options": {},
       "reverseYBuckets": false,
       "scopedVars": {
         "Measurement": {
@@ -1063,7 +1107,7 @@
     }
   ],
   "refresh": "5s",
-  "schemaVersion": 21,
+  "schemaVersion": 27,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -1078,6 +1122,8 @@
             "http_req_duration"
           ]
         },
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": true,
         "label": null,
@@ -1138,6 +1184,8 @@
         },
         "datasource": "$datasource_name",
         "definition": "",
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": true,
         "label": "URL",
@@ -1157,7 +1205,12 @@
       },
       {
         "current": {
+          "selected": false,
+          "text": "k6influxdb",
+          "value": "k6influxdb"
         },
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": false,
         "label": null,
@@ -1197,7 +1250,7 @@
     ]
   },
   "timezone": "browser",
-  "title": "k6 Load Testing Results with req",
+  "title": "k6 Load Testing Results",
   "uid": "ReuNR5Aik",
   "version": 1
 }
