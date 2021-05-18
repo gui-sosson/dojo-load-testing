@@ -1,4 +1,4 @@
-import { group, check, sleep } from 'k6';
+import { group, sleep } from 'k6';
 import http from 'k6/http';
 
 // This example suppose you already know how to write a custom scenario.
@@ -6,8 +6,12 @@ import http from 'k6/http';
 // Used to have memory shared across virtual users to avoid a crash.
 import { SharedArray } from "k6/data";
 
-const BRANDS = new SharedArray("brands", function() { return JSON.parse(open('./data/brands.json')).brands; });
-const PRODUCTS = new SharedArray("products", function() { return JSON.parse(open('./data/products.json')).products; });
+const BRANDS = new SharedArray("brands", function() {
+  return JSON.parse(open('./data/brands.json')).brands;
+});
+const PRODUCTS = new SharedArray("products", function() {
+  return JSON.parse(open('./data/products.json')).products;
+});
 
 // This example demonstrate how to handle a case where you want to
 // test several scenarios with various probabilities. This is
@@ -15,28 +19,35 @@ const PRODUCTS = new SharedArray("products", function() { return JSON.parse(open
 // you know the current repartition of usage thanks to analytics or
 // monitoring.
 
-export let options = {
-  vus: 1,
-  stages: [
-    {
-      "duration": "30s",
-      "target": 1
-    },
-    {
-      "duration": "30s",
-      "target": 70
-    }
-  ],
+export const options = {
   maxRedirects: 0,
-  thresholds: {
-    "checks": [
-      "rate <= 1"
-    ],
-    "http_req_duration": [
-      "p(95) < 5000"
-    ]
-  },
+  vus: 1,
   discardResponseBodies: true,
+  scenarios: {
+    "ramp-up": {
+      executor: "ramping-vus",
+      startVUs: 0,
+      stages: [{
+        duration: "30s",
+        target: 70
+      }, {
+        duration: "4m",
+        target: 150
+      }, ],
+      gracefulRampDown: "0s",
+      gracefulStop: "30s",
+    },
+  },
+  thresholds: {
+    http_req_duration: [{
+      threshold: "p(95) < 5000",
+      abortOnFail: false
+    }],
+    http_req_failed: [{
+      threshold: "rate <= 0",
+      abortOnFail: false
+    }],
+  },
 };
 
 const BASE_URL = 'https://my.site.com'
@@ -47,20 +58,20 @@ const BASE_URL = 'https://my.site.com'
 const PAGE_TYPES = ['product', 'brand', 'homepage']
 const PAGE_WEIGHTS = [65, 2, 49]
 
-export default function () {
+export default function() {
   switch (PAGE_TYPES[getWeightedPageTypesIndex()]) {
-  case 'product':
-    runProduct(`${BASE_URL}/products/${getRandomItem(PRODUCTS)}`);
-    break;
-  case 'brand':
-    runBrand(`${BASE_URL}/brands/${getRandomItem(BRANDS)}`);
-    break;
-  case 'homepage':
-    runHomePage(BASE_URL);
-    break;
+    case 'product':
+      getPage('PRODUCT PAGE', `${BASE_URL}/products/${getRandomItem(PRODUCTS)}`);
+      break;
+    case 'brand':
+      getPage('BRAND PAGE', `${BASE_URL}/brands/${getRandomItem(BRANDS)}`);
+      break;
+    case 'homepage':
+      getPage('HOMEPAGE', BASE_URL);
+      break;
   }
 
-  sleep(Math.floor(Math.random()*4+1));
+  sleep(Math.floor(Math.random() * 4 + 1));
 }
 
 // This function let us get a random item to create a variety of
@@ -81,41 +92,9 @@ const getWeightedPageTypesIndex = () => {
     .length
 }
 
-const runHomePage = (url) => {
-  group(`HOMEPAGE - ${url}`, function () {
+const getPage = (pageName, url) => {
+  group(`${pageName} - ${url}`, function() {
     // This could be a complete independant scenario
-    let req, res;
-    req = [{
-      "method": "get",
-      "url": url,
-    }];
-    res = http.batch(req);
-    check(res[0], { "status is 200": (r) => r.status === 200 });
-  });
-}
-
-const runProduct = (productUrl) => {
-  group(`PRODUCT - ${url}`, function () {
-    // This could be a complete independant scenario
-    let req, res;
-    req = [{
-      "method": "get",
-      "url": url,
-    }];
-    res = http.batch(req);
-    check(res[0], { "status is 200": (r) => r.status === 200 });
-  });
-}
-
-const runBrand = (brandUrl) => {
-  group(`BRAND - ${url}`, function () {
-    // This could be a complete independant scenario
-    let req, res;
-    req = [{
-      "method": "get",
-      "url": url,
-    }];
-    res = http.batch(req);
-    check(res[0], { "status is 200": (r) => r.status === 200 });
+    http.get(url);
   });
 }
