@@ -43,6 +43,10 @@ For Theodo people you can watch a
   - copy content of `./visualisation/grafana-dashboard-config-to-import.json` (`cat ./visualisation/grafana-dashboard-config-to-import.json | pbcopy`)
   - click "+" > click "import" > paste json content > click "Load" > click "Import"
 
+## Websocket
+
+Read the specificities [here](./websocket.md)
+
 ## What does the boilerplate add?
 
 - This README with some commands to run
@@ -310,8 +314,8 @@ where some of the explanations of the
 script is a quicker way to understand basic problems and how to modify
 (or create) your scenario.
 
-Other exemple are provided. This list may not be explicit, please look
-directly in [scripts](./scripts) to see if you may use some exemple.
+Other exemple are provided in [scripts](./scripts) to see if you may
+use some exemple.
 
 #### Content
 
