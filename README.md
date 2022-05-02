@@ -41,7 +41,7 @@ For Theodo people you can watch a
 - connect to [http://localhost:3000](http://localhost:3000), you should see Grafana UI
 - import the dashboard:
   - copy content of `./visualisation/grafana-dashboard-config-to-import.json` (`cat ./visualisation/grafana-dashboard-config-to-import.json | pbcopy`)
-  - click "+" > click "import" > paste json content > click "Load" > click "Import"
+  - click "💠 Dashboard" > click "browse" > click "import" > paste json content > click"Load" > click "Import"
 
 ## Websocket
 
