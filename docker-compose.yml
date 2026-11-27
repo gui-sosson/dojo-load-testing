@@ -28,8 +28,23 @@ services:
     volumes:
       - ./visualisation/grafana-datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
 
+  app:
+    image: node:22-alpine
+    command: node --max-old-space-size=32 /app/server.js
+    restart: unless-stopped
+    networks:
+      - k6
+    ports:
+      - "8080:8080"
+    environment:
+      - WORKERS=10
+    volumes:
+      - ./server:/app
+
   k6:
     image: grafana/k6:latest
+    depends_on:
+      - app
     networks:
       - k6
     ports:

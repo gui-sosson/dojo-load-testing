@@ -43,6 +43,35 @@ For Theodo people you can watch a
   - copy content of `./visualisation/grafana-dashboard-config-to-import.json` (`cat ./visualisation/grafana-dashboard-config-to-import.json | pbcopy`)
   - click "💠 Dashboard" > click "browse" > click "import" > paste json content > click"Load" > click "Import"
 
+## Dojo: local server to load test
+
+`docker-compose up -d` also starts a fake shop API on
+[http://localhost:8080](http://localhost:8080) (`server/server.js`).
+
+| Route | Time to answer when idle |
+| --- | --- |
+| `GET /api/products` | ~150ms |
+| `GET /api/products/:id` | ~50ms |
+| `GET /health` | instant, shows busy workers and queue size |
+
+Follow its logs with `docker-compose logs -f app`.
+
+Run the dojo scenario with:
+`docker-compose run --rm k6 run /scripts/dojo-scenario.js`
+
+Exercises (the client asks: "how many customers can look at our
+products at the same time?"):
+
+1. **Write the scenario**: in `scripts/dojo-scenario.js`, write the
+   journey of a customer: look at the product list, wait 1 second,
+   open one product, wait 1 second.
+2. **Ramp up test**: replace the options of the scenario with a ramp
+   of 2 minutes and find the number of virtual users at which response
+   time goes above 1 second.
+3. **Plateau test**: ramp up to a number of virtual users below that
+   limit, then keep it for 2 minutes, and show that response time stays
+   under 1 second the whole time.
+
 ## Websocket
 
 Read the specificities [here](./websocket.md)
